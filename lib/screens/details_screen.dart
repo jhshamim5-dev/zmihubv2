@@ -11,8 +11,7 @@ class DetailsScreen extends StatefulWidget {
   final int mediaId;
   final String type;
 
-  const DetailsScreen({Key? key, required this.mediaId, required this.type})
-      : super(key: key);
+  const DetailsScreen({super.key, required this.mediaId, required this.type});
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
