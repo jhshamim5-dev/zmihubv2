@@ -8,11 +8,11 @@ class MediaRow extends StatelessWidget {
   final ValueChanged<int>? onSelect;
 
   const MediaRow({
-    Key? key,
+    super.key,
     required this.title,
     required this.items,
     this.onSelect,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +94,7 @@ class MediaRow extends StatelessWidget {
                                         vertical: 2), // px-1.5 py-0.5
                                     decoration: BoxDecoration(
                                       color: Colors.black
-                                          .withOpacity(0.6), // bg-black/60
+                                          .withValues(alpha: 0.6), // bg-black/60
                                       borderRadius: BorderRadius.circular(
                                           6), // rounded-md
                                     ),
