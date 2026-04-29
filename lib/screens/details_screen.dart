@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:url_launcher/url_launcher.dart'; // Added URL Launcher!
+import 'package:url_launcher/url_launcher.dart';
 import '../models/anilist_models.dart';
 import '../services/anilist_service.dart';
 import '../providers/library_provider.dart';
@@ -30,11 +30,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Future<void> _fetchDetails() async {
     try {
       final media = await AniListService.getMediaDetails(widget.mediaId);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _media = media;
           _isLoading = false;
         });
+      }
     } catch (_) {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -88,16 +89,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading)
+    if (_isLoading) {
       return const Scaffold(
           backgroundColor: Color(0xFF0A0A0A),
           body: Center(
               child: CircularProgressIndicator(color: Colors.indigoAccent)));
-    if (_media == null)
+    }
+    if (_media == null) {
       return const Scaffold(
           body: Center(
               child: Text("Failed to load details",
                   style: TextStyle(color: Colors.white))));
+    }
 
     final isAnime = widget.type == 'ANIME';
 
@@ -110,9 +113,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
             left: 16,
             right: 16),
         decoration: BoxDecoration(
-            color: const Color(0xFF0A0A0A).withOpacity(0.95),
+            color: const Color(0xFF0A0A0A).withValues(alpha: 0.95),
             border:
-                Border(top: BorderSide(color: Colors.white.withOpacity(0.05)))),
+                Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05)))),
         child: Row(
           children: [
             Expanded(
@@ -184,7 +187,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         colors: [
                           Colors.black54,
                           Colors.transparent,
-                          const Color(0xFF0A0A0A).withOpacity(0.8),
+                          const Color(0xFF0A0A0A).withValues(alpha: 0.8),
                           const Color(0xFF0A0A0A)
                         ],
                         stops: const [0.0, 0.4, 0.8, 1.0],
@@ -208,13 +211,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         CrossAxisAlignment.start, // Fixed alignment
                     children: [
                       Container(
-                        width: 110, height: 160,
+                        width: 110,
+                        height: 160,
                         // REMOVED THE NEGATIVE TRANSFORM THAT CAUSED FLUTLAB CLIPPING
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: Colors.black.withValues(alpha: 0.5),
                                   blurRadius: 10,
                                   offset: const Offset(0, 5))
                             ]),
@@ -277,10 +281,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       padding: const EdgeInsets.all(16),
                       margin: const EdgeInsets.only(top: 24, bottom: 8),
                       decoration: BoxDecoration(
-                          color: Colors.indigoAccent.withOpacity(0.1),
+                          color: Colors.indigoAccent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: Colors.indigoAccent.withOpacity(0.3))),
+                              color: Colors.indigoAccent.withValues(alpha: 0.3))),
                       child: Row(
                         children: [
                           Expanded(
@@ -329,7 +333,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       _media!.description
                           .replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ''),
                       style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 14,
                           height: 1.5)),
 
