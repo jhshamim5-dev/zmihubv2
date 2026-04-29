@@ -2,6 +2,18 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/anilist_models.dart';
 
+class AniListHomeResponse {
+  final List<AniListMedia> trending;
+  final List<AniListMedia> popular;
+  final List<AniListMedia> recentlyAdded;
+
+  AniListHomeResponse({
+    required this.trending,
+    required this.popular,
+    required this.recentlyAdded,
+  });
+}
+
 class AniListService {
   static const String _url = 'https://graphql.anilist.co';
 
