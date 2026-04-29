@@ -1,17 +1,17 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-enum TabType { ANIME, LIBRARY, MANGA }
+enum TabType { anime, library, manga }
 
 class FloatingNav extends StatelessWidget {
   final TabType currentTab;
   final ValueChanged<TabType> onTabChange;
 
   const FloatingNav({
-    Key? key,
+    super.key,
     required this.currentTab,
     required this.onTabChange,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +32,9 @@ class FloatingNav extends StatelessWidget {
                 padding: const EdgeInsets.all(8), // px-2 py-2
                 decoration: BoxDecoration(
                   color: const Color(0xFF171717)
-                      .withOpacity(0.8), // bg-neutral-900/80
+                      .withValues(alpha: 0.8), // bg-neutral-900/80
                   borderRadius: BorderRadius.circular(50),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   boxShadow: const [
                     BoxShadow(
                         color: Colors.black45,
@@ -45,10 +45,10 @@ class FloatingNav extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildTab(context, TabType.ANIME, 'ANIME', Icons.live_tv),
-                    _buildTab(context, TabType.LIBRARY, 'LIBRARY',
+                    _buildTab(context, TabType.anime, 'ANIME', Icons.live_tv),
+                    _buildTab(context, TabType.library, 'LIBRARY',
                         Icons.video_library),
-                    _buildTab(context, TabType.MANGA, 'MANGA', Icons.menu_book),
+                    _buildTab(context, TabType.manga, 'MANGA', Icons.menu_book),
                   ],
                 ),
               ),
@@ -72,7 +72,7 @@ class FloatingNav extends StatelessWidget {
             horizontal: 16, vertical: 12), // px-4 py-3
         decoration: BoxDecoration(
           color: isActive
-              ? Colors.indigoAccent.withOpacity(0.2)
+              ? Colors.indigoAccent.withValues(alpha: 0.2)
               : Colors.transparent, // active pill bg
           borderRadius: BorderRadius.circular(50),
         ),
