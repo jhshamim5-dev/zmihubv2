@@ -156,7 +156,8 @@ class _LibraryScreenState extends State<LibraryScreen>
       ),
       itemCount: library.favorites.length,
       itemBuilder: (context, index) {
-        final media = library.favorites[index];
+        final favoriteEntry = library.favorites[index];
+        final media = favoriteEntry.media;
         return GestureDetector(
           onTap: () => _handleMediaSelect(media),
           child: Column(
