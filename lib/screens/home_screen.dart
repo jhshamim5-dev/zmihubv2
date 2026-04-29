@@ -1,107 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../models/anilist_models.dart';
 import '../services/anilist_service.dart';
 import '../widgets/hero_slider.dart';
 import '../widgets/media_row.dart';
+import 'details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String type; // 'ANIME' or 'MANGA'
-  final ValueChanged<int> onSelectMedia;
 
-  const HomeScreen({
-    Key? key,
-    required this.type,
-    required this.onSelectMedia,
-  }) : super(key: key);
+  const HomeScreen({super.key, required this.type});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  AniListHomeResponse? _data;
-  bool _loading = true;
-  String? _error;
+  late Future<Map<String, List<AniListMedia>>> _homeDataFuture;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _homeDataFuture = AniListService.fetchHomeData(widget.type);
   }
 
-  @override
-  void didUpdateWidget(HomeScreen oldWidget) {
-    if (oldWidget.type != widget.type) {
-      _fetchData();
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  Future<void> _fetchData() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final res = await AniListService.fetchHomeData(widget.type);
-      if (mounted) {
-        setState(() {
-          _data = res;
-          _loading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _loading = false;
-        });
-      }
-    }
+  void _handleMediaSelect(AniListMedia media) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            DetailsScreen(mediaId: media.id, type: widget.type),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.indigoAccent),
-      );
-    }
+    final isAnime = widget.type == 'ANIME';
 
-    if (_error != null || _data == null) {
-      return Center(
-        child: Text("Failed to load: $_error",
-            style: const TextStyle(color: Colors.redAccent)),
-      );
-    }
+    return FutureBuilder<Map<String, List<AniListMedia>>>(
+      future: _homeDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: SpinKitFoldingCube(
+              color: isAnime ? Colors.indigoAccent : Colors.pinkAccent,
+              size: 40.0,
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Error loading data:\n${snapshot.error}',
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          );
+        } else if (snapshot.hasData) {
+          final trending = snapshot.data!['trending'] ?? [];
+          final popular = snapshot.data!['popular'] ?? [];
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 112), // pb-28
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeroSlider(
-            items: _data!.trending,
-            onSelect: widget.onSelectMedia,
-          ),
-          const SizedBox(height: 8), // mt-2
-          MediaRow(
-            title: "New & Trending",
-            items: _data!.trending.length > 5 ? _data!.trending.sublist(5) : [],
-            onSelect: widget.onSelectMedia,
-          ),
-          MediaRow(
-            title: "Most Popular",
-            items: _data!.popular,
-            onSelect: widget.onSelectMedia,
-          ),
-          MediaRow(
-            title: "Recently Added",
-            items: _data!.recentlyAdded,
-            onSelect: widget.onSelectMedia,
-          ),
-        ],
-      ),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeroSlider(items: trending, onSelect: _handleMediaSelect),
+                const SizedBox(height: 10),
+                MediaRow(
+                  title: isAnime ? 'Trending Anime' : 'Trending Manga',
+                  items: trending,
+                  onSelect: _handleMediaSelect,
+                ),
+                MediaRow(
+                  title: isAnime ? 'Top Rated' : 'Most Popular',
+                  items: popular,
+                  onSelect: _handleMediaSelect,
+                ),
+              ],
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 }
