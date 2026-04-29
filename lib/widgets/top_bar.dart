@@ -7,10 +7,10 @@ class TopBar extends StatelessWidget {
   final VoidCallback onSearchClick;
 
   const TopBar({
-    Key? key,
+    super.key,
     required this.title,
     required this.onSearchClick,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class TopBar extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.8),
+            Colors.black.withValues(alpha: 0.8),
             Colors.transparent,
           ],
         ),
@@ -48,7 +48,7 @@ class TopBar extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                     child:
                         const Icon(Icons.search, color: Colors.white, size: 22),
@@ -81,7 +81,7 @@ class TopBar extends StatelessWidget {
               color: Colors.indigoAccent,
               shape: BoxShape.circle,
               border:
-                  Border.all(color: Colors.white.withOpacity(0.2), width: 2),
+                  Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
               boxShadow: const [
                 BoxShadow(
                     color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
