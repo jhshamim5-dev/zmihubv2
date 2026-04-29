@@ -18,7 +18,7 @@ void main() {
 }
 
 class AnimeMangaStreamingApp extends StatelessWidget {
-  const AnimeMangaStreamingApp({Key? key}) : super(key: key);
+  const AnimeMangaStreamingApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class AnimeMangaStreamingApp extends StatelessWidget {
 }
 
 class MainLayout extends StatefulWidget {
-  const MainLayout({Key? key}) : super(key: key);
+  const MainLayout({super.key});
 
   @override
   State<MainLayout> createState() => _MainLayoutState();
@@ -59,30 +59,29 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
-        title: Text(
-          _currentIndex == 0
-              ? 'AnimeHub'
-              : _currentIndex == 1
-                  ? 'My Library'
-                  : 'MangaHub',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => SearchScreen(
-                      initialType: _currentIndex == 2 ? 'MANGA' : 'ANIME'),
-                ),
-              );
-            },
-          )
-        ],
-      ),
+      appBar: _currentIndex == 1
+          ? null
+          : AppBar(
+              title: Text(
+                _currentIndex == 0 ? 'AnimeHub' : 'MangaHub',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SearchScreen(
+                            initialType:
+                                _currentIndex == 2 ? 'MANGA' : 'ANIME'),
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
