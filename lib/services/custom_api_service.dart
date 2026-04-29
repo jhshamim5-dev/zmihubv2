@@ -54,8 +54,9 @@ class CustomApiService {
   static Future<List<CustomChapter>> fetchMangaChapters(int anilistId) async {
     final res = await http
         .get(Uri.parse('$mangaBaseUrl/api/chapter-list?id=$anilistId'));
-    if (res.statusCode != 200)
+    if (res.statusCode != 200) {
       throw Exception('Failed to fetch manga chapters');
+    }
 
     final data = jsonDecode(res.body);
     final List chaptersList = data['chapters'] ?? [];
