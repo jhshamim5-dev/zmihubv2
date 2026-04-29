@@ -106,9 +106,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     try {
       final stream = await CustomApiService.fetchStream(
           widget.media.id, ep.number.toInt(), _currentServerName!, typeToFetch);
-
-      final aniskip =
-          await CustomApiService.fetchAniSkip(widget.media.id, ep.number);
+          
+      final aniskip = await CustomApiService.fetchAniSkip(widget.media.id, ep.number);
       if (aniskip != null && aniskip['found'] == true) {
         final results = aniskip['results'] as List?;
         if (results != null) {
@@ -211,24 +210,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
           final stream = await CustomApiService.fetchStream(
               widget.media.id, ep.number.toInt(), server, endpointType);
 
-          final aniskip =
-              await CustomApiService.fetchAniSkip(widget.media.id, ep.number);
+          final aniskip = await CustomApiService.fetchAniSkip(widget.media.id, ep.number);
           if (aniskip != null && aniskip['found'] == true) {
             final results = aniskip['results'] as List?;
             if (results != null) {
               for (var r in results) {
                 if (r['skipType'] == 'op' || r['skipType'] == 'mixed-op') {
-                  stream.introStart =
-                      (r['interval']['startTime'] as num).toInt();
+                  stream.introStart = (r['interval']['startTime'] as num).toInt();
                   stream.introEnd = (r['interval']['endTime'] as num).toInt();
-                } else if (r['skipType'] == 'ed' ||
-                    r['skipType'] == 'mixed-ed') {
-                  stream.outroStart =
-                      (r['interval']['startTime'] as num).toInt();
+                } else if (r['skipType'] == 'ed' || r['skipType'] == 'mixed-ed') {
+                  stream.outroStart = (r['interval']['startTime'] as num).toInt();
                   stream.outroEnd = (r['interval']['endTime'] as num).toInt();
                 } else if (r['skipType'] == 'recap') {
-                  stream.recapStart =
-                      (r['interval']['startTime'] as num).toInt();
+                  stream.recapStart = (r['interval']['startTime'] as num).toInt();
                   stream.recapEnd = (r['interval']['endTime'] as num).toInt();
                 }
               }
@@ -303,8 +297,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       );
     }
 
-    if ((widget.type ?? widget.media.type) == 'MANGA' &&
-        _activeMangaChapter != null) {
+    if ((widget.type ?? widget.media.type) == 'MANGA' && _activeMangaChapter != null) {
       final index =
           _chapters.indexWhere((c) => c.number == _activeMangaChapter);
       final hasNext = index < _chapters.length - 1;
@@ -487,14 +480,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Text(_formatNumber(ep.number),
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold)),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(_formatNumber(ep.number),
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold)),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Wrap(
+                                          alignment: WrapAlignment.center,
                                           children: [
                                             if (ep.isSub)
                                               Container(
@@ -544,11 +542,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                         const Icon(Icons.menu_book,
                                             color: Colors.pinkAccent, size: 16),
                                         const SizedBox(height: 4),
-                                        Text(_formatNumber(ch.number),
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold)),
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(_formatNumber(ch.number),
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold)),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
