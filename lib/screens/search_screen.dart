@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../models/anilist_models.dart';
 import '../services/anilist_service.dart';
 import 'details_screen.dart';
@@ -26,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    _type = widget.initialType;
+    _type = initialType;
   }
 
   @override
@@ -91,10 +90,10 @@ class _SearchScreenState extends State<SearchScreen> {
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: 'Search anime, manga...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
               border: InputBorder.none,
               filled: true,
-              fillColor: Colors.black.withOpacity(0.5),
+              fillColor: Colors.black.withValues(alpha: 0.5),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
               focusedBorder: OutlineInputBorder(
@@ -176,9 +175,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildBody() {
     if (_isLoading) {
       return Center(
-        child: SpinKitFadingCircle(
+        child: CircularProgressIndicator(
           color: _type == 'ANIME' ? Colors.indigoAccent : Colors.pinkAccent,
-          size: 40.0,
         ),
       );
     }
