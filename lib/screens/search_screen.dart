@@ -1,285 +1,244 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../models/anilist_models.dart';
 import '../services/anilist_service.dart';
+import 'details_screen.dart';
 
 class SearchScreen extends StatefulWidget {
-  final VoidCallback onBack;
-  final ValueChanged<int> onSelectMedia;
   final String initialType;
 
-  const SearchScreen({
-    Key? key,
-    required this.onBack,
-    required this.onSelectMedia,
-    this.initialType = 'ANIME',
-  }) : super(key: key);
+  const SearchScreen({super.key, required this.initialType});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _queryCtrl = TextEditingController();
-  String _type = 'ANIME';
+  final TextEditingController _searchController = TextEditingController();
+  late String _type;
+  String _query = '';
   List<AniListMedia> _results = [];
-  bool _loading = false;
-  Timer? _debounceTimer;
+  bool _isLoading = false;
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _type = widget.initialType;
-    _queryCtrl.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
-    _queryCtrl.dispose();
-    _debounceTimer?.cancel();
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
-  void _onSearchChanged() {
-    final query = _queryCtrl.text.trim();
+  void _onSearchChanged(String query) {
+    setState(() => _query = query);
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+
     if (query.length < 3) {
-      if (_results.isNotEmpty) setState(() => _results = []);
+      setState(() {
+        _results = [];
+        _isLoading = false;
+      });
       return;
     }
 
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      _performSearch(query, _type);
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _performSearch();
     });
   }
 
-  Future<void> _performSearch(String query, String type) async {
-    setState(() => _loading = true);
+  Future<void> _performSearch() async {
+    setState(() => _isLoading = true);
     try {
-      final res = await AniListService.searchMedia(query, type);
-      if (mounted) setState(() => _results = res);
+      final results = await AniListService.searchMedia(_query.trim(), _type);
+      setState(() => _results = results);
     } catch (e) {
-      // ignore
+      debugPrint(e.toString());
     } finally {
-      if (mounted) setState(() => _loading = false);
+      setState(() => _isLoading = false);
     }
   }
 
-  void _setType(String type) {
-    setState(() => _type = type);
-    if (_queryCtrl.text.trim().length >= 3) {
-      _performSearch(_queryCtrl.text.trim(), type);
-    }
+  void _handleMediaSelect(AniListMedia media) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailsScreen(mediaId: media.id, type: _type),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A), // bg-neutral-950
-      body: Column(
-        children: [
-          // Search Header
-          Container(
-            padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 16,
-                bottom: 16,
-                left: 16,
-                right: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF171717), // bg-neutral-900
-              border: Border(
-                  bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black26, offset: Offset(0, 4), blurRadius: 6)
-              ],
+      backgroundColor: const Color(0xFF0A0A0A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF171717),
+        elevation: 4,
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: TextField(
+            controller: _searchController,
+            onChanged: _onSearchChanged,
+            autofocus: true,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: 'Search anime, manga...',
+              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+              border: InputBorder.none,
+              filled: true,
+              fillColor: Colors.black.withOpacity(0.5),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.indigoAccent),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
             ),
-            child: Column(
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: widget.onBack,
-                      icon: const Icon(Icons.arrow_back,
-                          color: Color(0xFFA3A3A3)), // text-neutral-400
-                      hoverColor: Colors.white,
-                    ),
-                    Expanded(
-                      child: Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF262626), // bg-neutral-800
-                          borderRadius: BorderRadius.circular(12), // rounded-xl
-                        ),
-                        child: TextField(
-                          controller: _queryCtrl,
-                          autofocus: true,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            hintText: "Search anime, manga...",
-                            hintStyle: TextStyle(
-                                color: Color(0xFF737373)), // text-neutral-500
-                            prefixIcon:
-                                Icon(Icons.search, color: Color(0xFF737373)),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                          ),
-                        ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() => _type = 'ANIME');
+                      if (_query.length >= 3) _performSearch();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _type == 'ANIME'
+                            ? Colors.indigoAccent
+                            : Colors.grey[850],
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Type Toggle
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 48), // px-12
-                  child: Row(
-                    children: [
-                      Expanded(child: _buildToggleButton('Anime', 'ANIME')),
-                      const SizedBox(width: 8),
-                      Expanded(child: _buildToggleButton('Manga', 'MANGA')),
-                    ],
+                      alignment: Alignment.center,
+                      child: Text('Anime',
+                          style: TextStyle(
+                              color: _type == 'ANIME'
+                                  ? Colors.white
+                                  : Colors.grey[400],
+                              fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                )
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() => _type = 'MANGA');
+                      if (_query.length >= 3) _performSearch();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _type == 'MANGA'
+                            ? Colors.pinkAccent
+                            : Colors.grey[850],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text('Manga',
+                          style: TextStyle(
+                              color: _type == 'MANGA'
+                                  ? Colors.white
+                                  : Colors.grey[400],
+                              fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-
-          // Results Area
-          Expanded(
-            child: _loading
-                ? const Center(
-                    child:
-                        CircularProgressIndicator(color: Colors.indigoAccent))
-                : _queryCtrl.text.trim().length >= 3 &&
-                        _results.isEmpty &&
-                        !_loading
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.search,
-                                size: 48, color: Colors.white.withOpacity(0.5)),
-                            const SizedBox(height: 8),
-                            Text("No results found for \"${_queryCtrl.text}\"",
-                                style:
-                                    const TextStyle(color: Color(0xFF737373))),
-                          ],
-                        ),
-                      )
-                    : GridView.builder(
-                        padding: const EdgeInsets.only(
-                            left: 16, right: 16, top: 16, bottom: 80), // pb-20
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount:
-                              3, // Roughly matches md:grid-cols-4 for mobile
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.55, // Extra height for text
-                        ),
-                        itemCount: _results.length,
-                        itemBuilder: (context, index) {
-                          final item = _results[index];
-                          return GestureDetector(
-                            onTap: () => widget.onSelectMedia(item.id),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                AspectRatio(
-                                  aspectRatio: 2 / 3,
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF262626),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          image: DecorationImage(
-                                              image: CachedNetworkImageProvider(
-                                                  item.coverImage.large),
-                                              fit: BoxFit.cover),
-                                        ),
-                                      ),
-                                      if (item.averageScore != null)
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                                color: Colors.black
-                                                    .withOpacity(0.8),
-                                                borderRadius:
-                                                    BorderRadius.circular(4)),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Icon(Icons.star,
-                                                    color: Colors.amber,
-                                                    size: 10),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                    "${item.averageScore! / 10}",
-                                                    style: const TextStyle(
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white)),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  item.title.display,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      color: Color(0xFFE5E5E5),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.2),
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-          )
-        ],
+        ),
       ),
+      body: _buildBody(),
     );
   }
 
-  Widget _buildToggleButton(String label, String type) {
-    final isActive = _type == type;
-    return GestureDetector(
-      onTap: () => _setType(type),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 6), // py-1.5
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isActive ? Colors.indigoAccent : const Color(0xFF262626),
-          borderRadius: BorderRadius.circular(50),
+  Widget _buildBody() {
+    if (_isLoading) {
+      return Center(
+        child: SpinKitFadingCircle(
+          color: _type == 'ANIME' ? Colors.indigoAccent : Colors.pinkAccent,
+          size: 40.0,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isActive ? Colors.white : const Color(0xFFA3A3A3)),
+      );
+    }
+
+    if (_query.length >= 3 && _results.isEmpty && !_isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 64, color: Colors.white24),
+            SizedBox(height: 16),
+            Text('No results found.',
+                style: TextStyle(color: Colors.white54, fontSize: 16)),
+          ],
         ),
+      );
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(16.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.65,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 16,
       ),
+      itemCount: _results.length,
+      itemBuilder: (context, index) {
+        final item = _results[index];
+        return GestureDetector(
+          onTap: () => _handleMediaSelect(item),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: item.coverImage.large,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    placeholder: (context, url) =>
+                        Container(color: Colors.grey[900]),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                item.title.display,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
