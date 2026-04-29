@@ -13,7 +13,7 @@ class FullScreenMangaReader extends StatefulWidget {
   final VoidCallback onClose;
 
   const FullScreenMangaReader({
-    Key? key,
+    super.key,
     required this.anilistId,
     required this.chapterNum,
     required this.title,
@@ -22,7 +22,7 @@ class FullScreenMangaReader extends StatefulWidget {
     required this.onNext,
     required this.onPrev,
     required this.onClose,
-  }) : super(key: key);
+  });
 
   @override
   State<FullScreenMangaReader> createState() => _FullScreenMangaReaderState();
@@ -53,11 +53,12 @@ class _FullScreenMangaReaderState extends State<FullScreenMangaReader> {
       // FIXED ERROR: Now passing both anilistId and chapterNum correctly as an int!
       final pages = await CustomApiService.fetchMangaPages(
           widget.anilistId, widget.chapterNum);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _pages = pages;
           _isLoading = false;
         });
+      }
     } catch (_) {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -118,7 +119,7 @@ class _FullScreenMangaReaderState extends State<FullScreenMangaReader> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                      Colors.black.withOpacity(0.9),
+                      Colors.black.withValues(alpha: 0.9),
                       Colors.transparent
                     ])),
                 child: Row(
@@ -154,7 +155,7 @@ class _FullScreenMangaReaderState extends State<FullScreenMangaReader> {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                      Colors.black.withOpacity(0.9),
+                      Colors.black.withValues(alpha: 0.9),
                       Colors.transparent
                     ])),
                 child: Row(
