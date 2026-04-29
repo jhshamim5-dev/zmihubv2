@@ -13,14 +13,14 @@ class NativeVideoPlayer extends StatefulWidget {
   final VoidCallback onChangeServer;
 
   const NativeVideoPlayer({
-    Key? key,
+    super.key,
     required this.streamData,
     required this.title,
     required this.onClose,
     this.onNext,
     this.onPrev,
     required this.onChangeServer,
-  }) : super(key: key);
+  });
 
   @override
   State<NativeVideoPlayer> createState() => _NativeVideoPlayerState();
@@ -126,8 +126,9 @@ class _NativeVideoPlayerState extends State<NativeVideoPlayer> {
   void _startHideTimer() {
     _hideTimer?.cancel();
     _hideTimer = Timer(const Duration(seconds: 4), () {
-      if (mounted && _controller.value.isPlaying)
+      if (mounted && _controller.value.isPlaying) {
         setState(() => _showControls = false);
+      }
     });
   }
 
@@ -141,7 +142,7 @@ class _NativeVideoPlayerState extends State<NativeVideoPlayer> {
     final isLeft = details.globalPosition.dx < width / 2;
 
     final currentPos = _controller.value.position;
-    final seekAmount = const Duration(seconds: 10);
+    const seekAmount = Duration(seconds: 10);
 
     setState(() {
       _seekIndicator = isLeft ? '-10s' : '+10s';
@@ -228,7 +229,7 @@ class _NativeVideoPlayerState extends State<NativeVideoPlayer> {
             child: IgnorePointer(
               ignoring: !_showControls,
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -238,7 +239,7 @@ class _NativeVideoPlayerState extends State<NativeVideoPlayer> {
                       Colors.transparent,
                       Colors.black87
                     ],
-                    stops: const [0.0, 0.2, 0.8, 1.0],
+                    stops: [0.0, 0.2, 0.8, 1.0],
                   ),
                 ),
                 child: Column(
@@ -361,21 +362,24 @@ class _NativeVideoPlayerState extends State<NativeVideoPlayer> {
                     style: const TextStyle(
                         color: Colors.black, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.9),
+                    backgroundColor: Colors.white.withValues(alpha: 0.9),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30))),
                 onPressed: () {
-                  if (_activeSkipType == 'Intro')
+                  if (_activeSkipType == 'Intro') {
                     _controller
                         .seekTo(Duration(seconds: widget.streamData.introEnd!));
-                  if (_activeSkipType == 'Outro')
+                  }
+                  if (_activeSkipType == 'Outro') {
                     _controller
                         .seekTo(Duration(seconds: widget.streamData.outroEnd!));
-                  if (_activeSkipType == 'Recap')
+                  }
+                  if (_activeSkipType == 'Recap') {
                     _controller
                         .seekTo(Duration(seconds: widget.streamData.recapEnd!));
+                  }
                 },
               ),
             ),
