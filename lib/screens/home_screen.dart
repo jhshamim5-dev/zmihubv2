@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../models/anilist_models.dart';
 import '../services/anilist_service.dart';
 import '../widgets/hero_slider.dart';
@@ -16,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<Map<String, List<AniListMedia>>> _homeDataFuture;
+  late Future<AniListHomeResponse> _homeDataFuture;
 
   @override
   void initState() {
@@ -38,14 +37,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final isAnime = widget.type == 'ANIME';
 
-    return FutureBuilder<Map<String, List<AniListMedia>>>(
+    return FutureBuilder<AniListHomeResponse>(
       future: _homeDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
-            child: SpinKitFoldingCube(
+            child: CircularProgressIndicator(
               color: isAnime ? Colors.indigoAccent : Colors.pinkAccent,
-              size: 40.0,
             ),
           );
         } else if (snapshot.hasError) {
@@ -57,8 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         } else if (snapshot.hasData) {
-          final trending = snapshot.data!['trending'] ?? [];
-          final popular = snapshot.data!['popular'] ?? [];
+          final trending = snapshot.data!.trending;
+          final popular = snapshot.data!.popular;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 100),
