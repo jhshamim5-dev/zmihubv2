@@ -8,8 +8,7 @@ class HeroSlider extends StatefulWidget {
   final List<AniListMedia> items;
   final ValueChanged<int>? onSelect;
 
-  const HeroSlider({Key? key, required this.items, this.onSelect})
-      : super(key: key);
+  const HeroSlider({super.key, required this.items, this.onSelect});
 
   @override
   State<HeroSlider> createState() => _HeroSliderState();
@@ -94,7 +93,7 @@ class _HeroSliderState extends State<HeroSlider> {
                 image: DecorationImage(
                   image: CachedNetworkImageProvider(imageUrl),
                   fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3),
+                  colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.3),
                       BlendMode.darken), // matches opacity-70
                 ),
               ),
@@ -109,7 +108,7 @@ class _HeroSliderState extends State<HeroSlider> {
                 end: Alignment.topCenter,
                 colors: [
                   const Color(0xFF0A0A0A), // neutral-950
-                  const Color(0xFF0A0A0A).withOpacity(0.4), // neutral-950/40
+                  const Color(0xFF0A0A0A).withValues(alpha: 0.4), // neutral-950/40
                   Colors.transparent,
                 ],
               ),
@@ -149,7 +148,7 @@ class _HeroSliderState extends State<HeroSlider> {
                                         vertical: 4), // px-2 py-1
                                     decoration: BoxDecoration(
                                       color: Colors.indigoAccent
-                                          .withOpacity(0.8), // bg-indigo-500/80
+                                          .withValues(alpha: 0.8), // bg-indigo-500/80
                                       borderRadius: BorderRadius.circular(
                                           4), // rounded-sm
                                     ),
@@ -223,10 +222,10 @@ class _HeroSliderState extends State<HeroSlider> {
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               backgroundColor:
-                                  Colors.white.withOpacity(0.2), // bg-white/20
+                                  Colors.white.withValues(alpha: 0.2), // bg-white/20
                               foregroundColor: Colors.white,
                               side: BorderSide(
-                                  color: Colors.white.withOpacity(0.2)),
+                                  color: Colors.white.withValues(alpha: 0.2)),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -259,7 +258,7 @@ class _HeroSliderState extends State<HeroSlider> {
                   decoration: BoxDecoration(
                     color: isActive
                         ? Colors.indigoAccent
-                        : Colors.white.withOpacity(0.4),
+                        : Colors.white.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(50),
                   ),
                 );
