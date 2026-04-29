@@ -15,11 +15,11 @@ class PlayerScreen extends StatefulWidget {
   final VoidCallback? onBack;
 
   const PlayerScreen({
-    Key? key,
+    super.key,
     required this.media,
     this.type,
     this.onBack,
-  }) : super(key: key);
+  });
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -57,8 +57,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       _gallery.add(widget.media.characters[i].image);
     }
     _galleryTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (mounted && _gallery.isNotEmpty)
+      if (mounted && _gallery.isNotEmpty) {
         setState(() => _galleryIndex = (_galleryIndex + 1) % _gallery.length);
+      }
     });
     _fetchData();
   }
@@ -71,10 +72,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Future<void> _fetchData() async {
     try {
-      if ((widget.type ?? widget.media.type) == 'ANIME')
+      if ((widget.type ?? widget.media.type) == 'ANIME') {
         _episodes = await CustomApiService.fetchEpisodes(widget.media.id);
-      else
+      } else {
         _chapters = await CustomApiService.fetchMangaChapters(widget.media.id);
+      }
     } catch (_) {}
     if (mounted) setState(() => _isLoading = false);
   }
@@ -97,6 +99,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       typeToFetch = 'sub';
     }
 
+    if (!mounted) return;
     showDialog(
         context: context,
         barrierColor: Colors.black87,
@@ -106,7 +109,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     try {
       final stream = await CustomApiService.fetchStream(
           widget.media.id, ep.number.toInt(), _currentServerName!, typeToFetch);
-          
+
       final aniskip = await CustomApiService.fetchAniSkip(widget.media.id, ep.number);
       if (aniskip != null && aniskip['found'] == true) {
         final results = aniskip['results'] as List?;
@@ -126,8 +129,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
         }
       }
 
-      Provider.of<LibraryProvider>(context, listen: false)
-          .updateHistory(widget.media, ep.number.toInt());
+      if (!mounted) return;
+      final libraryProvider = Provider.of<LibraryProvider>(context, listen: false);
+      libraryProvider.updateHistory(widget.media, ep.number.toInt());
       Navigator.pop(context); // Close loading overlay
 
       setState(() {
@@ -136,6 +140,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         _currentServerType = typeToFetch; // Saves fallback memory
       });
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text(
@@ -201,6 +206,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     return InkWell(
       onTap: () async {
         Navigator.pop(context);
+        if (!mounted) return;
         showDialog(
             context: context,
             barrierDismissible: false,
@@ -229,8 +235,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
             }
           }
 
-          Provider.of<LibraryProvider>(context, listen: false)
-              .updateHistory(widget.media, ep.number.toInt());
+          if (!mounted) return;
+          final libraryProvider = Provider.of<LibraryProvider>(context, listen: false);
+          libraryProvider.updateHistory(widget.media, ep.number.toInt());
           Navigator.pop(context);
           setState(() {
             _currentServerName = server; // <--- Save User's Server Pick
@@ -239,6 +246,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             _activeStreamData = stream;
           });
         } catch (e) {
+          if (!mounted) return;
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Stream failed to start')));
@@ -266,8 +274,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   void _openMangaChapter(num chapterNum) {
-    Provider.of<LibraryProvider>(context, listen: false)
-        .updateHistory(widget.media, chapterNum.toInt());
+    final libraryProvider = Provider.of<LibraryProvider>(context, listen: false);
+    libraryProvider.updateHistory(widget.media, chapterNum.toInt());
     setState(() => _activeMangaChapter = chapterNum);
   }
 
@@ -369,7 +377,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 colors: [
                           Colors.black87,
                           Colors.transparent,
-                          const Color(0xFF0A0A0A).withOpacity(0.9),
+                          const Color(0xFF0A0A0A).withValues(alpha: 0.9),
                           const Color(0xFF0A0A0A)
                         ],
                                 stops: const [
@@ -515,7 +523,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                       horizontal: 4,
                                                       vertical: 2),
                                                   color: Colors.indigoAccent
-                                                      .withOpacity(0.2),
+                                                      .withValues(alpha: 0.2),
                                                   child: const Text('DUB',
                                                       style: TextStyle(
                                                           fontSize: 8,
