@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/library_provider.dart';
-import 'widgets/bottom_nav_bar.dart';
+import 'widgets/floating_nav.dart';
 import 'screens/home_screen.dart';
 import 'screens/library_screen.dart';
 import 'screens/search_screen.dart';
@@ -86,11 +86,11 @@ class _MainLayoutState extends State<MainLayout> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: FloatingNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
+      bottomNavigationBar: FloatingNav(
+        currentTab: TabType.values[_currentIndex],
+        onTabChange: (tab) {
           setState(() {
-            _currentIndex = index;
+            _currentIndex = TabType.values.indexOf(tab);
           });
         },
       ),
