@@ -25,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    _type = initialType;
+    _type = widget.initialType;
   }
 
   @override
