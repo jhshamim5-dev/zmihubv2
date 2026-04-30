@@ -58,7 +58,6 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
       appBar: _currentIndex == 1
           ? null
           : AppBar(
@@ -82,17 +81,21 @@ class _MainLayoutState extends State<MainLayout> {
                 )
               ],
             ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: FloatingNav(
-        currentTab: TabType.values[_currentIndex],
-        onTabChange: (tab) {
-          setState(() {
-            _currentIndex = TabType.values.indexOf(tab);
-          });
-        },
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _currentIndex,
+            children: _screens,
+          ),
+          FloatingNav(
+            currentTab: TabType.values[_currentIndex],
+            onTabChange: (tab) {
+              setState(() {
+                _currentIndex = TabType.values.indexOf(tab);
+              });
+            },
+          ),
+        ],
       ),
     );
   }
