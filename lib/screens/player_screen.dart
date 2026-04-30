@@ -179,20 +179,20 @@ class _PlayerScreenState extends State<PlayerScreen> {
               const Text('Select premium streaming server',
                   style: TextStyle(color: Colors.white54)),
               const SizedBox(height: 24),
-              _serverButton('Server-1', 'vidplay', 'sub', Icons.live_tv, ep),
+              _serverButton('Server-1', 'hd-1', 'sub', Icons.live_tv, ep),
               const SizedBox(height: 12),
               if (ep.isDub)
                 Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _serverButton(
-                        'Server-1 (Dub)', 'vidplay', 'dub', Icons.mic, ep)),
+                        'Server-1 (Dub)', 'hd-1', 'dub', Icons.mic, ep)),
               _serverButton(
-                  'Server-2 BackUp', 'mycloud', 'sub', Icons.live_tv, ep),
+                  'Server-2', 'hd-2', 'sub', Icons.live_tv, ep),
               const SizedBox(height: 12),
               if (ep.isDub)
                 Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _serverButton('Server-2 BackUp (Dub)', 'mycloud',
+                    child: _serverButton('Server-2 (Dub)', 'hd-2',
                         'dub', Icons.mic, ep)),
             ],
           ),
