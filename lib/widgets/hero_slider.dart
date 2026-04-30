@@ -6,7 +6,7 @@ import 'dart:math' as math;
 
 class HeroSlider extends StatefulWidget {
   final List<AniListMedia> items;
-  final ValueChanged<int>? onSelect;
+  final ValueChanged<AniListMedia>? onSelect;
 
   const HeroSlider({super.key, required this.items, this.onSelect});
 
@@ -214,7 +214,7 @@ class _HeroSliderState extends State<HeroSlider> {
                               elevation: 10,
                               shadowColor: Colors.white24,
                             ),
-                            onPressed: () => widget.onSelect?.call(item.id),
+                            onPressed: () => widget.onSelect?.call(item),
                             child: const Text("Play Now",
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
@@ -231,7 +231,7 @@ class _HeroSliderState extends State<HeroSlider> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50)),
                             ),
-                            onPressed: () => widget.onSelect?.call(item.id),
+                            onPressed: () => widget.onSelect?.call(item),
                             child: const Text("Details",
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
