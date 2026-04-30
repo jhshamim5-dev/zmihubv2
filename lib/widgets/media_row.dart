@@ -5,7 +5,7 @@ import '../models/anilist_models.dart';
 class MediaRow extends StatelessWidget {
   final String title;
   final List<AniListMedia> items;
-  final ValueChanged<int>? onSelect;
+  final ValueChanged<AniListMedia>? onSelect;
 
   const MediaRow({
     super.key,
@@ -53,7 +53,7 @@ class MediaRow extends StatelessWidget {
                     .display; // Handles english || romaji based on your model
 
                 return GestureDetector(
-                  onTap: () => onSelect?.call(item.id),
+                  onTap: () => onSelect?.call(item),
                   child: SizedBox(
                     width: 140, // shrink-0 w-[140px]
                     child: Column(
